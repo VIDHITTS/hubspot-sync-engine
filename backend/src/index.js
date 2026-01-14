@@ -17,7 +17,7 @@ const { apiLimiter, webhookLimiter } = require("./middleware/rateLimiter");
 const app = express();
 
 app.use(cors({
-  origin: process.env.CORS_ORIGIN || "*",
+  origin: "*", // Allow all origins for debugging
   methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
   credentials: true
 }));
