@@ -2,7 +2,8 @@ const service = require("./service");
 
 const getAll = async (req, res) => {
   try {
-    const { status } = req.query;
+    // Default to OPEN if no status specified, so resolved ones don't clutter the view
+    const status = req.query.status || 'OPEN';
     const conflicts = await service.getAll(status);
     res.json(conflicts);
   } catch (error) {

@@ -64,6 +64,13 @@ const syncContactToHubSpot = async (contactId) => {
   }
 };
 
+const checkTimeLock = (entity) => {
+  const TIME_LOCK_WINDOW = 60000; // 60 seconds
+  if (!entity.lastModifiedLocal) return false;
+  const timeDiff = Date.now() - new Date(entity.lastModifiedLocal).getTime();
+  return timeDiff <= TIME_LOCK_WINDOW;
+};
+
 const syncContactFromHubSpot = async (hubspotData) => {
   const hubspotId = hubspotData.id;
   const props = hubspotData.properties;
@@ -94,11 +101,21 @@ const syncContactFromHubSpot = async (hubspotData) => {
     return { action: "CREATED", contact };
   }
 
+  // CHECK FOR ECHO
   if (!hasChanged(incomingData, contact.lastSyncedHash)) {
     return { action: "SKIPPED", reason: "No real change", contact };
   }
 
-  if (contact.syncStatus === "PENDING") {
+  // TIME-LOCK: 60s Buffer against rapid updates (Race Condition Guard)
+  // Even if not strictly "PENDING", if it was modified < 60s ago, we block to be safe.
+  const isTimeLocked = checkTimeLock(contact);
+
+  if (contact.syncStatus === "PENDING" || isTimeLocked) {
+    const conflictType = isTimeLocked ? "TIME-LOCK" : "CONCURRENT-EDIT";
+
+    // Check if conflict already exists to prevent duplicates? 
+    // Simplified: Just create new Conflict request
+
     const conflict = await Conflict.create({
       entityType: "contact",
       entityId: contact._id,
@@ -114,6 +131,10 @@ const syncContactFromHubSpot = async (hubspotData) => {
       localModifiedAt: contact.lastModifiedLocal,
       hubspotModifiedAt: new Date(),
       status: "PENDING",
+      conflictMetadata: {
+        type: conflictType,
+        reason: isTimeLocked ? "Local update within 60s window" : "Pending local changes",
+      },
     });
 
     contact.syncStatus = "CONFLICT";
@@ -228,8 +249,12 @@ const syncCompanyFromHubSpot = async (hubspotData) => {
     return { action: "SKIPPED", reason: "No real change (echo)", company };
   }
 
-  // Check for conflict
-  if (company.syncStatus === "PENDING") {
+  // TIME-LOCK
+  const isTimeLocked = checkTimeLock(company);
+
+  if (company.syncStatus === "PENDING" || isTimeLocked) {
+    const conflictType = isTimeLocked ? "TIME-LOCK" : "CONCURRENT-EDIT";
+
     const conflict = await Conflict.create({
       entityType: "company",
       entityId: company._id,
@@ -245,6 +270,10 @@ const syncCompanyFromHubSpot = async (hubspotData) => {
       localModifiedAt: company.lastModifiedLocal,
       hubspotModifiedAt: new Date(),
       status: "PENDING",
+      conflictMetadata: {
+        type: conflictType,
+        reason: isTimeLocked ? "Local update within 60s window" : "Pending local changes",
+      },
     });
 
     company.syncStatus = "CONFLICT";

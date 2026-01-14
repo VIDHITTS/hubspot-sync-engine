@@ -15,17 +15,21 @@ const ConflictSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
-    localSnapshot: {
-      type: mongoose.Schema.Types.Mixed,
-      required: true,
+    // Supporting both naming conventions for safety/migration
+    localSnapshot: { type: mongoose.Schema.Types.Mixed },
+    remoteSnapshot: { type: mongoose.Schema.Types.Mixed },
+    localData: { type: mongoose.Schema.Types.Mixed },
+    hubspotData: { type: mongoose.Schema.Types.Mixed },
+
+    conflictMetadata: {
+      type: Map,
+      of: String,
+      default: {}
     },
-    remoteSnapshot: {
-      type: mongoose.Schema.Types.Mixed,
-      required: true,
-    },
+
     status: {
       type: String,
-      enum: ["OPEN", "RESOLVED"],
+      enum: ["OPEN", "PENDING", "RESOLVED"], // Added PENDING
       default: "OPEN",
     },
     resolutionStrategy: {

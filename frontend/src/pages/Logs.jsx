@@ -1,49 +1,40 @@
 import { useState, useEffect } from "react";
 import { api } from "../services/api";
+import { ScrollText, ArrowRight, ArrowLeft } from "lucide-react";
 
 function Logs() {
     const [logs, setLogs] = useState([]);
     const [loading, setLoading] = useState(true);
 
-    const loadLogs = async () => {
-        try {
-            const data = await api.logs.getAll();
-            setLogs(data);
-        } catch (err) {
-            console.error(err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
-        loadLogs();
+        const fetchLogs = async () => {
+            try {
+                const data = await api.logs.getAll();
+                setLogs(data);
+            } catch (err) {
+                console.error(err);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchLogs();
+        const interval = setInterval(fetchLogs, 5000);
+        return () => clearInterval(interval);
     }, []);
 
-    const getStatusBadge = (status) => {
-        const s = status === "SUCCESS" ? "synced" : "failed";
-        return <span className={`badge ${s}`}>{status}</span>;
-    };
-
-    const getDirectionIcon = (direction) => {
-        return direction === "INBOUND" ? "↓" : "↑";
-    };
-
-    if (loading) {
-        return (
-            <div className="loading">
-                <div className="spinner"></div>
-            </div>
-        );
-    }
+    if (loading) return <div className="loading"><div className="spinner"></div></div>;
 
     return (
         <div>
             <div className="page-header">
-                <h2>Sync Logs</h2>
-                <button className="btn btn-secondary" onClick={loadLogs}>
-                    Refresh
-                </button>
+                <div>
+                    <h2 style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+                        <ScrollText color="var(--color-primary)" />
+                        System Logs
+                    </h2>
+                    <p style={{ color: "var(--color-text-muted)" }}>Recent synchronization events</p>
+                </div>
             </div>
 
             <div className="card">
@@ -51,37 +42,47 @@ function Logs() {
                     <thead>
                         <tr>
                             <th>Direction</th>
-                            <th>Type</th>
+                            <th>Entity</th>
                             <th>Action</th>
                             <th>Status</th>
                             <th>Duration</th>
                             <th>Time</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        {logs.length === 0 ? (
-                            <tr>
-                                <td colSpan="6" className="empty-state">
-                                    No sync logs yet
+                    <tbody style={{ fontSize: "13px" }}>
+                        {logs.map((log) => (
+                            <tr key={log._id}>
+                                <td>
+                                    <div style={{ display: "flex", alignItems: "center", gap: "8px" }}>
+                                        {log.direction === "INBOUND" ? (
+                                            <ArrowRight size={14} color="var(--color-warning)" />
+                                        ) : (
+                                            <ArrowLeft size={14} color="var(--color-primary)" />
+                                        )}
+                                        <span style={{ fontWeight: "600", fontSize: "11px", color: "var(--color-text-muted)" }}>
+                                            {log.direction}
+                                        </span>
+                                    </div>
+                                </td>
+                                <td style={{ textTransform: "capitalize" }}>{log.entityType}</td>
+                                <td>{log.action}</td>
+                                <td>
+                                    {log.status === "SUCCESS" ? (
+                                        <span style={{ color: "var(--color-success)" }}>● Success</span>
+                                    ) : log.status === "FAILED" ? (
+                                        <span style={{ color: "var(--color-error)" }}>● Failed</span>
+                                    ) : (
+                                        <span>{log.status}</span>
+                                    )}
+                                </td>
+                                <td style={{ fontFamily: "monospace", color: "var(--color-text-muted)" }}>
+                                    {log.duration}ms
+                                </td>
+                                <td style={{ color: "var(--color-text-muted)" }}>
+                                    {new Date(log.createdAt).toLocaleTimeString()}
                                 </td>
                             </tr>
-                        ) : (
-                            logs.map((log) => (
-                                <tr key={log._id}>
-                                    <td>
-                                        <span style={{ fontSize: "18px" }}>
-                                            {getDirectionIcon(log.direction)}
-                                        </span>{" "}
-                                        {log.direction}
-                                    </td>
-                                    <td>{log.entityType}</td>
-                                    <td>{log.action}</td>
-                                    <td>{getStatusBadge(log.status)}</td>
-                                    <td>{log.duration ? `${log.duration}ms` : "-"}</td>
-                                    <td>{new Date(log.createdAt).toLocaleString()}</td>
-                                </tr>
-                            ))
-                        )}
+                        ))}
                     </tbody>
                 </table>
             </div>
