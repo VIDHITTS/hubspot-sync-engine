@@ -26,10 +26,27 @@ const NAV_ITEMS = [
 function App() {
   const [activePage, setActivePage] = useState("dashboard");
   const [systemHealth, setSystemHealth] = useState("connected"); // simplified for visual
+  const [conflictCount, setConflictCount] = useState(0);
+
+  useEffect(() => {
+    const fetchConflicts = async () => {
+      try {
+        const data = await api.conflicts.getAll();
+        const active = data.filter(c => c.status === "OPEN").length;
+        setConflictCount(active);
+      } catch (err) {
+        console.error("Failed to fetch conflicts", err);
+      }
+    };
+
+    fetchConflicts();
+    const interval = setInterval(fetchConflicts, 5000); // Poll every 5 seconds
+    return () => clearInterval(interval);
+  }, []);
 
   const renderPage = () => {
     switch (activePage) {
-      case "dashboard": return <Dashboard onChangePage={setActivePage} />;
+      case "dashboard": return <Dashboard onChangePage={setActivePage} conflictCount={conflictCount} />;
       case "contacts": return <Contacts />;
       case "companies": return <Companies />;
       case "conflicts": return <Conflicts />;
@@ -68,9 +85,29 @@ function App() {
                 key={item.id}
                 className={`nav-item ${isActive ? "active" : ""}`}
                 onClick={() => setActivePage(item.id)}
+                style={{ justifyContent: "space-between" }} // Align badge to right
               >
-                <Icon size={20} />
-                <span>{item.label}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: "12px" }}>
+                  <Icon size={20} />
+                  <span>{item.label}</span>
+                </div>
+                {item.id === "conflicts" && conflictCount > 0 && (
+                  <span style={{
+                    background: "var(--danger)",
+                    color: "white",
+                    borderRadius: "50%",
+                    fontSize: "11px",
+                    fontWeight: "700",
+                    height: "20px",
+                    minWidth: "20px",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    padding: "0 6px"
+                  }}>
+                    {conflictCount}
+                  </span>
+                )}
               </div>
             );
           })}
@@ -92,7 +129,7 @@ function App() {
           {renderPage()}
         </div>
       </main>
-    </div>
+    </div >
   );
 }
 

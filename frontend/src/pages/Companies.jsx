@@ -249,16 +249,22 @@ function Companies() {
                             <form onSubmit={handleSubmit}>
                                 <div className="modal-body" style={{ display: "grid", gap: "16px" }}>
                                     <div>
-                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>COMPANY NAME</label>
+                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>
+                                            COMPANY NAME <span style={{ color: "var(--danger)", marginLeft: "4px" }}>*</span>
+                                        </label>
                                         <input required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />
                                     </div>
                                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                                         <div>
-                                            <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>DOMAIN</label>
-                                            <input required value={formData.domain} onChange={e => setFormData({ ...formData, domain: e.target.value })} />
+                                            <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>
+                                                DOMAIN <span style={{ opacity: 0.5, fontWeight: 400, fontSize: "11px" }}>(Optional)</span>
+                                            </label>
+                                            <input value={formData.domain} onChange={e => setFormData({ ...formData, domain: e.target.value })} />
                                         </div>
                                         <div>
-                                            <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>INDUSTRY</label>
+                                            <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>
+                                                INDUSTRY <span style={{ opacity: 0.5, fontWeight: 400, fontSize: "11px" }}>(Optional)</span>
+                                            </label>
                                             <select value={formData.industry} onChange={e => setFormData({ ...formData, industry: e.target.value })}>
                                                 {HUBSPOT_INDUSTRIES.map(ind => (
                                                     <option key={ind.value} value={ind.value}>{ind.label}</option>
@@ -267,11 +273,15 @@ function Companies() {
                                         </div>
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>PHONE</label>
+                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>
+                                            PHONE <span style={{ opacity: 0.5, fontWeight: 400, fontSize: "11px" }}>(Optional)</span>
+                                        </label>
                                         <input value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>ADDRESS</label>
+                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>
+                                            ADDRESS <span style={{ opacity: 0.5, fontWeight: 400, fontSize: "11px" }}>(Optional)</span>
+                                        </label>
                                         <input value={formData.address} onChange={e => setFormData({ ...formData, address: e.target.value })} />
                                     </div>
                                 </div>

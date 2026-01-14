@@ -3,7 +3,7 @@ import { api } from "../services/api";
 import { ArrowRight, RefreshCw, Layers, CheckCircle, AlertOctagon } from "lucide-react";
 import PageInfo from "../components/PageInfo";
 
-function Dashboard({ onChangePage }) {
+function Dashboard({ onChangePage, conflictCount }) {
     const [stats, setStats] = useState({ total: 0, success: 0, failed: 0 });
     const [loading, setLoading] = useState(false);
 
@@ -15,8 +15,20 @@ function Dashboard({ onChangePage }) {
 
     const loadData = async () => {
         try {
-            const data = await api.logs.getStats();
-            setStats(data || { total: 0, success: 0, failed: 0 });
+            // Fetch real data to show current state
+            const [contacts, companies] = await Promise.all([
+                api.contacts.getAll(),
+                api.companies.getAll()
+            ]);
+
+            const total = (contacts.length || 0) + (companies.length || 0);
+
+            const syncedContacts = contacts.filter(c => c.hubspotId).length;
+            const syncedCompanies = companies.filter(c => c.hubspotId).length;
+            const success = syncedContacts + syncedCompanies;
+
+            // Still use generic stats structure, but populated with live record counts
+            setStats({ total, success });
         } catch (err) {
             console.error(err);
         }
@@ -75,20 +87,20 @@ function Dashboard({ onChangePage }) {
             {/* STATS GRID */}
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(240px, 1fr))", gap: "24px", marginBottom: "40px" }}>
                 <StatCard
-                    label="Total Operations"
+                    label="Total Records"
                     value={stats.total}
                     icon={Layers}
                     color="#fff"
                 />
                 <StatCard
-                    label="Successful Syncs"
+                    label="Synced Records"
                     value={stats.success}
                     icon={CheckCircle}
                     color="var(--accent)"
                 />
                 <StatCard
                     label="Conflicts Detected"
-                    value={stats.failed}
+                    value={conflictCount !== undefined ? conflictCount : 0}
                     icon={AlertOctagon}
                     color="var(--danger)"
                     onClick={() => onChangePage("conflicts")}
@@ -109,7 +121,13 @@ function Dashboard({ onChangePage }) {
                     <h3 style={{ fontSize: "16px", marginBottom: "8px" }}>Next Sync</h3>
                     <div style={{ display: "flex", alignItems: "center", gap: "8px", color: "var(--text-secondary)", fontSize: "14px" }}>
                         <div className="spinner" style={{ width: "12px", height: "12px", border: "2px solid var(--text-secondary)", borderTopColor: "transparent", borderRadius: "50%", animation: "spin 1s linear infinite" }}></div>
-                        Auto-scheduled (~ {new Date(Date.now() + 5 * 60000).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})
+                        {/* Calculate next 5-minute interval (stable time) */}
+                        Auto-scheduled (~ {(() => {
+                            const now = new Date();
+                            const nextSync = new Date(Math.ceil(now.getTime() / (5 * 60000)) * (5 * 60000));
+                            if (nextSync <= now) nextSync.setMinutes(nextSync.getMinutes() + 5);
+                            return nextSync.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                        })()})
                     </div>
                 </div>
             </div>

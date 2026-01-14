@@ -250,24 +250,32 @@ function Contacts() {
                                 <div className="modal-body" style={{ display: "grid", gap: "16px" }}>
                                     <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "16px" }}>
                                         <div>
-                                            <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>FIRST NAME</label>
+                                            <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>
+                                                FIRST NAME <span style={{ opacity: 0.5, fontWeight: 400, fontSize: "11px" }}>(Optional)</span>
+                                            </label>
                                             <input required value={formData.firstname} onChange={e => setFormData({ ...formData, firstname: e.target.value })} />
                                         </div>
                                         <div>
-                                            <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>LAST NAME</label>
+                                            <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>
+                                                LAST NAME <span style={{ opacity: 0.5, fontWeight: 400, fontSize: "11px" }}>(Optional)</span>
+                                            </label>
                                             <input required value={formData.lastname} onChange={e => setFormData({ ...formData, lastname: e.target.value })} />
                                         </div>
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>EMAIL ADDRESS</label>
+                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>EMAIL <span style={{ color: "var(--danger)", marginLeft: "4px" }}>*</span> ADDRESS</label>
                                         <input type="email" required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>PHONE</label>
+                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>
+                                            PHONE <span style={{ opacity: 0.5, fontWeight: 400, fontSize: "11px" }}>(Optional)</span>
+                                        </label>
                                         <input value={formData.phone} onChange={e => setFormData({ ...formData, phone: e.target.value })} />
                                     </div>
                                     <div>
-                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>COMPANY</label>
+                                        <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>
+                                            COMPANY <span style={{ opacity: 0.5, fontWeight: 400, fontSize: "11px" }}>(Optional)</span>
+                                        </label>
                                         <input value={formData.company} onChange={e => setFormData({ ...formData, company: e.target.value })} />
                                     </div>
                                 </div>
