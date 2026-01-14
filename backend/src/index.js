@@ -5,6 +5,7 @@ const cors = require("cors");
 
 const contactRouter = require("./contactService/router");
 const companyRouter = require("./companyService/router");
+const syncRouter = require("./syncService/router");
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.get("/health", (req, res) => {
 
 app.use("/api/contacts", contactRouter);
 app.use("/api/companies", companyRouter);
+app.use("/api/sync", syncRouter);
 
 const connectDB = async () => {
   try {
