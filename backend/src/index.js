@@ -4,6 +4,7 @@ const mongoose = require("mongoose");
 const cors = require("cors");
 
 const contactRouter = require("./contactService/router");
+const companyRouter = require("./companyService/router");
 
 const app = express();
 
@@ -14,11 +15,13 @@ app.get("/health", (req, res) => {
   res.json({
     status: "ok",
     timestamp: new Date().toISOString(),
-    mongodb: mongoose.connection.readyState === 1 ? "connected" : "disconnected",
+    mongodb:
+      mongoose.connection.readyState === 1 ? "connected" : "disconnected",
   });
 });
 
 app.use("/api/contacts", contactRouter);
+app.use("/api/companies", companyRouter);
 
 const connectDB = async () => {
   try {
