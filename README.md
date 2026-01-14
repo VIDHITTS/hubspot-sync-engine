@@ -37,8 +37,7 @@ Create a `.env` file in the `backend` directory:
 PORT=3000
 MONGODB_URI=mongodb://localhost:27017/hubspot-sync
 HUBSPOT_ACCESS_TOKEN=your_hubspot_private_app_token
-REDIS_HOST=localhost
-REDIS_PORT=6379
+REDIS_URL=rediss://default:password@host:port  # For production (Upstash, Render, etc)
 CORS_ORIGIN=http://localhost:5173  # Add your production frontend URL here
 ```
 
