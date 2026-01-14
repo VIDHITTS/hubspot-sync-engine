@@ -11,6 +11,7 @@ const conflictRouter = require("./conflictService/router");
 const logRouter = require("./logService/router");
 const queueRouter = require("./queueService/router");
 const { createWorker } = require("./queueService/worker");
+const { apiLimiter, webhookLimiter } = require("./middleware/rateLimiter");
 
 const app = express();
 
@@ -26,13 +27,13 @@ app.get("/health", (req, res) => {
   });
 });
 
-app.use("/api/contacts", contactRouter);
-app.use("/api/companies", companyRouter);
-app.use("/api/sync", syncRouter);
-app.use("/api/webhooks", webhookRouter);
-app.use("/api/conflicts", conflictRouter);
-app.use("/api/logs", logRouter);
-app.use("/api/queue", queueRouter);
+app.use("/api/contacts", apiLimiter, contactRouter);
+app.use("/api/companies", apiLimiter, companyRouter);
+app.use("/api/sync", apiLimiter, syncRouter);
+app.use("/api/webhooks", webhookLimiter, webhookRouter);
+app.use("/api/conflicts", apiLimiter, conflictRouter);
+app.use("/api/logs", apiLimiter, logRouter);
+app.use("/api/queue", apiLimiter, queueRouter);
 
 const connectDB = async () => {
   try {
@@ -49,7 +50,7 @@ const PORT = process.env.PORT || 3000;
 connectDB().then(() => {
   createWorker();
   console.log("BullMQ worker started");
-  
+
   app.listen(PORT, () => {
     console.log("Server running on port " + PORT);
   });
