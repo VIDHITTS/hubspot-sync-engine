@@ -253,13 +253,13 @@ function Contacts() {
                                             <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>
                                                 FIRST NAME <span style={{ opacity: 0.5, fontWeight: 400, fontSize: "11px" }}>(Optional)</span>
                                             </label>
-                                            <input required value={formData.firstname} onChange={e => setFormData({ ...formData, firstname: e.target.value })} />
+                                            <input value={formData.firstname} onChange={e => setFormData({ ...formData, firstname: e.target.value })} />
                                         </div>
                                         <div>
                                             <label style={{ fontSize: "12px", fontWeight: "700", color: "var(--text-secondary)", marginBottom: "8px", display: "block" }}>
                                                 LAST NAME <span style={{ opacity: 0.5, fontWeight: 400, fontSize: "11px" }}>(Optional)</span>
                                             </label>
-                                            <input required value={formData.lastname} onChange={e => setFormData({ ...formData, lastname: e.target.value })} />
+                                            <input value={formData.lastname} onChange={e => setFormData({ ...formData, lastname: e.target.value })} />
                                         </div>
                                     </div>
                                     <div>
